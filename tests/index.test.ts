@@ -31,3 +31,21 @@ test("Session", () => {
   expectChangeSession(() => session.clear());
   expect(session["keyForNumber"]).toBeUndefined();
 });
+
+test("restore", () => {
+  const data: Record<string, any> = {};
+  const mockAstroCookies = {
+    get: (key: string) => ({ value: data[key] }),
+    set: (key: string, value: string | Record<string, any>) => {
+      data[key] = value;
+    },
+  } as any;
+  const session1 = Session.from({ cookies: mockAstroCookies });
+
+  session1.set("keyForString", "myValue");
+  session1["keyForNumber"] = 33;
+
+  const session2 = Session.from({ cookies: mockAstroCookies });
+  expect(session2.get("keyForString")).toBe("myValue");
+  expect(session2["keyForNumber"]).toBe(33);
+});
