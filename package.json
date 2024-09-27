@@ -10,7 +10,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "astro": "^4.0.0"
+    "astro": "^4.0.0",
+    "jsonwebtoken": "^9.0.0"
   },
   "devDependencies": {
     "vitest": "^2.0.0"
