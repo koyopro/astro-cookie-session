@@ -47,3 +47,11 @@ const expectSessionChange = (fn: () => void) => {
   fn();
   expect(data["___session"]).not.toBe(before);
 };
+
+test("secure", () => {
+  const session = Session.from({ cookies: mockAstroCookies });
+  session.set("keyForString", "myValue");
+
+  expect(data["___session"]).not.toContain("keyForString");
+  expect(data["___session"]).not.toContain("myValue");
+})
