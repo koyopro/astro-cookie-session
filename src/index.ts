@@ -7,19 +7,24 @@ type Context = {
   cookies: AstroCookies;
 };
 
+type Options = {
+  cookieName?: string;
+};
+
 export class Session {
   key = "___session";
   data: Record<string, any> = {};
   [key: string]: any;
 
-  constructor(private context: Context) {
+  constructor(private context: Context, options: Options = {}) {
+    this.key = options.cookieName || this.key;
     this.secret = this.getSecret();
     const jwt = this.context.cookies.get(this.key)?.value;
     this.restore(jwt);
   }
 
-  static from(context: Context) {
-    return new Proxy(new Session(context), {
+  static from(context: Context, options: Options = {}) {
+    return new Proxy(new Session(context, options), {
       get(target, key, receiver) {
         if (["get", "set", "delete", "clear"].includes(key as string)) {
           return Reflect.get(target, key, receiver).bind(target);

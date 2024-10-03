@@ -55,3 +55,11 @@ test("secure", () => {
   expect(data["___session"]).not.toContain("keyForString");
   expect(data["___session"]).not.toContain("myValue");
 })
+
+test("cookieName option", () => {
+  const session = Session.from({ cookies: mockAstroCookies }, { cookieName: "myCookieName" });
+  session.set("keyForString", "myValue");
+  expect(data["___session"]).toBeUndefined();
+  expect(data["myCookieName"]).not.toBeUndefined();
+  expect(session["keyForString"]).toBe("myValue");
+});
