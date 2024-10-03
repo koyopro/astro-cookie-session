@@ -1,14 +1,17 @@
+import { AstroCookieSetOptions } from "astro";
 import { Session } from "../src";
 
 let data: Record<string, any> = {};
+let setOptions: AstroCookieSetOptions | undefined;
 const mockAstroCookies = {
   get: (key: string) => ({ value: data[key] }),
-  set: (key: string, value: string | Record<string, any>) => {
+  set: (key: string, value: string | Record<string, any>, options?: AstroCookieSetOptions) => {
     data[key] = value;
+    setOptions = options;
   },
 } as any;
 
-beforeEach(() => (data = {}));
+beforeEach(() => (data = {}, setOptions = undefined));
 
 test("Session", () => {
   expect(data["___session"]).toBeUndefined();
@@ -63,3 +66,9 @@ test("cookieName option", () => {
   expect(data["myCookieName"]).not.toBeUndefined();
   expect(session["keyForString"]).toBe("myValue");
 });
+
+test("cookieSetOptions option", () => {
+  const session = Session.from({ cookies: mockAstroCookies }, { cookieSetOptions: { secure: true } });
+  session.set("keyForString", "myValue");
+  expect(setOptions).toEqual({ httpOnly: true, secure: true });
+})

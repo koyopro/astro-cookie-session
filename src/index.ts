@@ -1,4 +1,4 @@
-import type { AstroCookies } from "astro";
+import type { AstroCookies, AstroCookieSetOptions } from "astro";
 // @ts-ignore
 import pkg from "jsonwebtoken";
 const { sign, verify, JsonWebTokenError } = pkg;
@@ -9,15 +9,22 @@ type Context = {
 
 type Options = {
   cookieName?: string;
+  cookieSetOptions?: AstroCookieSetOptions;
 };
 
 export class Session {
   key = "___session";
+  setOptions: AstroCookieSetOptions = {
+    httpOnly: true,
+    // @ts-ignore
+    secure: import.meta.env.PROD
+  };
   data: Record<string, any> = {};
   [key: string]: any;
 
   constructor(private context: Context, options: Options = {}) {
     this.key = options.cookieName || this.key;
+    Object.assign(this.setOptions, options.cookieSetOptions);
     this.secret = this.getSecret();
     const jwt = this.context.cookies.get(this.key)?.value;
     this.restore(jwt);
@@ -90,6 +97,6 @@ export class Session {
 
   protected save() {
     const jwt = sign(this.data, this.secret, { algorithm: "HS256" });
-    this.context.cookies.set(this.key, jwt);
+    this.context.cookies.set(this.key, jwt, this.setOptions);
   }
 }
