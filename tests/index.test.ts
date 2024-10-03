@@ -14,7 +14,7 @@ const mockAstroCookies = {
 beforeEach(() => (data = {}, setOptions = undefined));
 
 test("Session", () => {
-  expect(data["___session"]).toBeUndefined();
+  expect(data["astro.session"]).toBeUndefined();
 
   const session = Session.from({ cookies: mockAstroCookies });
 
@@ -34,7 +34,7 @@ test("Session", () => {
 });
 
 test("restore Session", () => {
-  expect(data["___session"]).toBeUndefined();
+  expect(data["astro.session"]).toBeUndefined();
 
   const session1 = Session.from({ cookies: mockAstroCookies });
   session1.set("keyForString", "myValue");
@@ -46,23 +46,23 @@ test("restore Session", () => {
 });
 
 const expectSessionChange = (fn: () => void) => {
-  const before = data["___session"];
+  const before = data["astro.session"];
   fn();
-  expect(data["___session"]).not.toBe(before);
+  expect(data["astro.session"]).not.toBe(before);
 };
 
 test("secure", () => {
   const session = Session.from({ cookies: mockAstroCookies });
   session.set("keyForString", "myValue");
 
-  expect(data["___session"]).not.toContain("keyForString");
-  expect(data["___session"]).not.toContain("myValue");
+  expect(data["astro.session"]).not.toContain("keyForString");
+  expect(data["astro.session"]).not.toContain("myValue");
 })
 
 test("cookieName option", () => {
   const session = Session.from({ cookies: mockAstroCookies }, { cookieName: "myCookieName" });
   session.set("keyForString", "myValue");
-  expect(data["___session"]).toBeUndefined();
+  expect(data["astro.session"]).toBeUndefined();
   expect(data["myCookieName"]).not.toBeUndefined();
   expect(session["keyForString"]).toBe("myValue");
 });

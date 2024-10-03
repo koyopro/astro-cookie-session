@@ -13,7 +13,7 @@ type Options = {
 };
 
 export class Session {
-  key = "___session";
+  key = "astro.session";
   setOptions: AstroCookieSetOptions = {
     httpOnly: true,
     // @ts-ignore
