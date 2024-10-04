@@ -31,3 +31,17 @@ test("createCookieSessionStorage", () => {
   // @ts-expect-error
   session.foo = 2;
 });
+
+test("any type", () => {
+  const { getSession } = createCookieSessionStorage({});
+  const session = getSession({} as APIContext);
+
+  expectTypeOf(session).toEqualTypeOf<
+    Session<{ [key: string]: any }> & { [key: string]: any }
+  >();
+
+  session["foo"] = 1;
+  expectTypeOf(session["foo"]).toEqualTypeOf<any>();
+  session.set("foo", 2);
+  expectTypeOf(session.get("foo")).toEqualTypeOf<any>();
+});
