@@ -46,7 +46,7 @@ export class Session<T> {
   static from<T>(context: Context, init: T, options: Options = {}) {
     return new Proxy(new Session<T>(context, init, options), {
       get(target, key, receiver) {
-        if (["get", "set", "reset"].includes(key as string)) {
+        if (["has", "get", "set", "reset"].includes(key as string)) {
           return Reflect.get(target, key, receiver).bind(target);
         }
         return target.get(key as keyof T);
@@ -74,6 +74,10 @@ export class Session<T> {
       default:
         throw new Error(message);
     }
+  }
+
+  has<K extends keyof T>(key: K): boolean {
+    return this.get(key) != undefined;
   }
 
   get<K extends keyof T>(key: K): T[K] {

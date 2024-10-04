@@ -24,12 +24,18 @@ test("Session", () => {
   const { getSession } = createCookieSessionStorage<SessionData>({});
   const session = getSession({ cookies: mockAstroCookies });
 
+  expect(session.has("keyForNumber")).toBe(false);
+  expect(session.has("keyForString")).toBe(false);
+
   expectSessionChange(() => {
     session.set("keyForString", "myValue");
     session["keyForNumber"] = 33;
   });
   expect(session.get("keyForString")).toBe("myValue");
   expect(session["keyForNumber"]).toBe(33);
+
+  expect(session.has("keyForNumber")).toBe(true);
+  expect(session.has("keyForString")).toBe(true);
 
   expectSessionChange(() => session.reset("keyForString"));
   expect(session["keyForString"]).toBeUndefined();
