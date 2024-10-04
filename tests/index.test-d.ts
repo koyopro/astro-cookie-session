@@ -1,5 +1,6 @@
 import { APIContext } from "astro";
-import { createCookieSessionStorage, Session } from "../src";
+import { createCookieSessionStorage } from "../src";
+import { Session } from "../src/session";
 
 export type SessionData = {
   count: number;
