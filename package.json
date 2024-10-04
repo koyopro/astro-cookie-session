@@ -7,7 +7,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
-    "test": "vitest"
+    "test": "vitest --typecheck"
   },
   "author": "",
   "license": "MIT",
