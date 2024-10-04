@@ -3,43 +3,56 @@ import type { AstroCookies, AstroCookieSetOptions } from "astro";
 import pkg from "jsonwebtoken";
 const { sign, verify, JsonWebTokenError } = pkg;
 
-type Context = {
+export type Context = {
   cookies: AstroCookies;
 };
 
-type Options = {
+export type Options = {
   cookieName?: string;
   cookieSetOptions?: AstroCookieSetOptions;
 };
 
-export class Session {
+export const createCookieSessionStorage = <T extends Record<string, any>>(init: T, options?: Options) => {
+  return {
+    getSession: (context: Context): Session<T> & T =>  {
+      return Session.from(context, init, options) as any;
+    }
+  }
+}
+
+export class Session<T> {
   key = "astro.session";
   setOptions: AstroCookieSetOptions = {
     httpOnly: true,
     // @ts-ignore
-    secure: import.meta.env.PROD
+    secure: import.meta.env.PROD,
   };
-  data: Record<string, any> = {};
-  [key: string]: any;
+  protected data: T;
+  protected secret: string;
 
-  constructor(private context: Context, options: Options = {}) {
+  constructor(
+    private context: Context,
+    protected init: T,
+    options: Options = {}
+  ) {
     this.key = options.cookieName || this.key;
     Object.assign(this.setOptions, options.cookieSetOptions);
     this.secret = this.getSecret();
+    this.data = Object.assign({}, init);
     const jwt = this.context.cookies.get(this.key)?.value;
     this.restore(jwt);
   }
 
-  static from(context: Context, options: Options = {}) {
-    return new Proxy(new Session(context, options), {
+  static from<T>(context: Context, init: T, options: Options = {}) {
+    return new Proxy(new Session<T>(context, init, options), {
       get(target, key, receiver) {
-        if (["get", "set", "delete", "clear"].includes(key as string)) {
+        if (["get", "set", "reset"].includes(key as string)) {
           return Reflect.get(target, key, receiver).bind(target);
         }
-        return target.get(key as string);
+        return target.get(key as keyof T);
       },
       set(target, key, value) {
-        target.set(key as string, value);
+        target.set(key as keyof T, value);
         return true;
       },
     });
@@ -50,7 +63,8 @@ export class Session {
     if (secretKeyBase) {
       return secretKeyBase;
     }
-    const message = "Please set SECRET_KEY_BASE as an environment variable. [astro-cookie-session]";
+    const message =
+      "Please set SECRET_KEY_BASE as an environment variable. [astro-cookie-session]";
     switch (process.env.NODE_ENV || "") {
       case "test":
         return "test-secret-key-base";
@@ -62,22 +76,21 @@ export class Session {
     }
   }
 
-  set(key: string, value: any) {
+  get<K extends keyof T>(key: K): T[K] {
+    return this.data[key];
+  }
+
+  set<K extends keyof T>(key: K, value: T[K]) {
     this.data[key] = value;
     this.save();
   }
 
-  get(key: string) {
-    return this.data[key];
-  }
-
-  delete(key: string) {
-    delete this.data[key];
-    this.save();
-  }
-
-  clear() {
-    this.data = {};
+  reset(key?: keyof T) {
+    if (key) {
+      this.data[key] = this.init[key];
+    } else {
+      this.data = Object.assign({}, this.init);
+    }
     this.save();
   }
 
@@ -86,7 +99,7 @@ export class Session {
     try {
       const v = verify(jwt, this.secret, { algorithms: ["HS256"] });
       if (!v || typeof v !== "object") return;
-      this.data = v;
+      Object.assign(this.data as any, v);
     } catch (e: unknown) {
       if (e instanceof JsonWebTokenError) {
         // ignore
