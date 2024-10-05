@@ -32,7 +32,7 @@ export class Session<T> {
   static from<T>(cookies: Cookies, options: Options = {}) {
     return new Proxy(new Session<T>(cookies, options), {
       get(target, key, receiver) {
-        if (["has", "get", "set", "reset"].includes(key as string)) {
+        if (["has", "get", "set", "delete"].includes(key as string)) {
           return Reflect.get(target, key, receiver).bind(target);
         }
         return target.get(key as keyof T);
@@ -57,7 +57,7 @@ export class Session<T> {
     this.save();
   }
 
-  reset(key?: keyof T) {
+  delete(key?: keyof T) {
     if (key) {
       delete this.data[key];
     } else {

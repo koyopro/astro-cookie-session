@@ -37,11 +37,11 @@ test("Session", () => {
   expect(session.has("keyForNumber")).toBe(true);
   expect(session.has("keyForString")).toBe(true);
 
-  expectSessionChange(() => session.reset("keyForString"));
+  expectSessionChange(() => session.delete("keyForString"));
   expect(session["keyForString"]).toBeUndefined();
   expect(session["keyForNumber"]).toBe(33);
 
-  expectSessionChange(() => session.reset());
+  expectSessionChange(() => session.delete());
   expect(session["keyForNumber"]).toBeUndefined();
 });
 
