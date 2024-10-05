@@ -1,0 +1,20 @@
+---
+import { getSession } from "../sessions";
+
+const session = getSession(Astro.cookies); // Prepare the session
+
+if (Astro.request.method === "POST") {
+  const form = await Astro.request.formData();
+  session.set('userId', form.get("id") as string); // Set the session data
+}
+
+const userId = session.get("userId"); // Get the session data
+---
+{userId ? (
+  <p>Hello, {userId}!</p>
+) : (
+  <form method="post">
+    <label>User ID: <input type="text" name="id" /></label>
+    <input type="submit" value="Log in" />
+  </form>
+)}
