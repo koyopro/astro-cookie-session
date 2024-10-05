@@ -1,4 +1,5 @@
 ---
+// src/pages/index.astro
 import { getSession } from "../sessions";
 
 const session = getSession(Astro.cookies); // Prepare the session
@@ -6,24 +7,21 @@ const session = getSession(Astro.cookies); // Prepare the session
 if (Astro.request.method === "POST") {
   const form = await Astro.request.formData();
   session.set('userId', form.get("id") as string); // Set the session data
+  // session.userId = form.get("id") as string; // You can also use this code
 }
 
 const userId = session.get("userId"); // Get the session data
+// const userId = session.userId; // You can also use this code
 ---
 {userId ? (
   <p>Hello, {userId}!</p>
 
-	<a href="#" onclick="signout()">Log out</a>
+  <form method="post" action="/signout">
+    <input type="submit" value="Log out" />
+  </form>
 ) : (
   <form method="post">
-    <label>User ID: <input type="text" name="id" /></label>
+    <input type="text" name="id" placeholder="UserId" />
     <input type="submit" value="Log in" />
   </form>
 )}
-
-<script is:inline>
-	window.signout = async () => {
-		const response = await fetch("/api/signout", { method: "POST" });
-		if (response.ok) location.href = '/';
-	};
-</script>

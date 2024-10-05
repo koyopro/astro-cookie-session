@@ -70,8 +70,8 @@ export const { getSession } = createCookieSessionStorage<SessionData>({
 Use the `getSession()` function to prepare the session and the `session.set()` method to set the session data. The encrypted session data will be stored in a cookie, and you can retrieve it across requests using the `session.get()` method.
 
 ```typescript
-// src/pages/index.astro
 ---
+// src/pages/index.astro
 import { getSession } from "../sessions";
 
 const session = getSession(Astro.cookies); // Prepare the session
@@ -79,15 +79,21 @@ const session = getSession(Astro.cookies); // Prepare the session
 if (Astro.request.method === "POST") {
   const form = await Astro.request.formData();
   session.set('userId', form.get("id") as string); // Set the session data
+  // session.userId = form.get("id") as string; // You can also use this code
 }
 
 const userId = session.get("userId"); // Get the session data
+// const userId = session.userId; // You can also use this code
 ---
 {userId ? (
   <p>Hello, {userId}!</p>
+
+  <form method="post" action="/signout">
+    <input type="submit" value="Log out" />
+  </form>
 ) : (
   <form method="post">
-    <label>User ID: <input type="text" name="id" /></label>
+    <input type="text" name="id" placeholder="UserId" />
     <input type="submit" value="Log in" />
   </form>
 )}
@@ -96,16 +102,16 @@ const userId = session.get("userId"); // Get the session data
 ### Using the session in your Astro API routes
 
 ```typescript
-// src/pages/api/signout.ts
+// src/pages/signout.ts
 import type { APIRoute } from "astro";
-import { getSession } from "../../sessions";
+import { getSession } from "../sessions";
 
-export const POST: APIRoute = async ({ cookies }) => {
+export const POST: APIRoute = async ({ cookies, redirect }) => {
   const session = getSession(cookies); // Prepare the session
 
   session.delete('userId'); // Remove the user ID from the session
 
-  return new Response();
+  return redirect('/');;
 }
 ```
 
