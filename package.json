@@ -2,21 +2,38 @@
   "name": "astro-cookie-session",
   "version": "1.0.0",
   "type": "module",
-  "description": "",
+  "description": "Middleware for managing sessions using cookies on Astro.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "test": "vitest --typecheck"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koyopro/astro-cookie-session.git"
+  },
+  "bugs": {
+    "url": "https://github.com/koyopro/astro-cookie-session/issues"
+  },
+  "homepage": "https://github.com/koyopro/astro-cookie-session",
+  "keywords": [
+    "astro",
+    "cookie",
+    "session"
+  ],
+  "files": [
+    "README.md",
+    "dist"
+  ],
+  "author": "koyopro",
   "license": "MIT",
   "dependencies": {
-    "astro": "^4.0.0",
+    "astro": ">=4.0.0",
     "jsonwebtoken": "^9.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.7.4",
+    "@types/node": "^22.0.0",
     "vitest": "^2.0.0"
   }
 }
