@@ -13,21 +13,14 @@ export type Options = {
 };
 
 type Dict = { [key: string]: any };
+export type Nullable<T> = {
+  [P in keyof T]: T[P] | undefined;
+};
 
-export function createCookieSessionStorage<T extends Dict>(
-  options?: Options
-): {
-  getSession: (context: Context) => Session<T> & T;
-};
-export function createCookieSessionStorage<T extends Record<string, any>>(
-  options?: Options
-): {
-  getSession: (context: Context) => Session<T> & T;
-};
-export function createCookieSessionStorage(
+export function createCookieSessionStorage<T extends Record<string, any> = Dict>(
   options?: Options
 ) {
   return {
-    getSession: (context: Context) => Session.from(context, options),
+    getSession: (context: Context): Session<T> & Nullable<T> => Session.from(context, options) as any,
   };
 }
