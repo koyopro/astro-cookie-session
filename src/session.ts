@@ -5,6 +5,7 @@ import pkg from "jsonwebtoken";
 import { getSecret } from "./secret";
 const { sign, verify, JsonWebTokenError } = pkg;
 
+export type Cookies = Omit<AstroCookies, 'merge'>;
 
 export class Session<T> {
   key = "astro.session";
@@ -17,7 +18,7 @@ export class Session<T> {
   protected secret: string;
 
   constructor(
-    private cookies: AstroCookies,
+    private cookies: Cookies,
     options: Options = {}
   ) {
     this.key = options.cookieName || this.key;
@@ -28,7 +29,7 @@ export class Session<T> {
     this.restore(jwt);
   }
 
-  static from<T>(cookies: AstroCookies, options: Options = {}) {
+  static from<T>(cookies: Cookies, options: Options = {}) {
     return new Proxy(new Session<T>(cookies, options), {
       get(target, key, receiver) {
         if (["has", "get", "set", "reset"].includes(key as string)) {
