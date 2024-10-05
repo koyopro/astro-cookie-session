@@ -8,7 +8,7 @@ export type SessionData = {
 };
 
 test("createCookieSessionStorage", () => {
-  const { getSession } = createCookieSessionStorage<SessionData>({ count: 0 });
+  const { getSession } = createCookieSessionStorage<SessionData>();
   const session = getSession({} as APIContext);
 
   expectTypeOf(session).toEqualTypeOf<Session<SessionData> & SessionData>();
@@ -16,7 +16,7 @@ test("createCookieSessionStorage", () => {
   session.count = 1;
   expectTypeOf(session.count).toEqualTypeOf<number>();
   session.set("count", 2);
-  expectTypeOf(session.get("count")).toEqualTypeOf<number>();
+  expectTypeOf(session.get("count")).toEqualTypeOf<number | undefined>();
   // @ts-expect-error
   session.count = "";
   // @ts-expect-error

@@ -21,7 +21,7 @@ beforeEach(() => (data = {}, setOptions = undefined));
 test("Session", () => {
   expect(data["astro.session"]).toBeUndefined();
 
-  const { getSession } = createCookieSessionStorage<SessionData>({});
+  const { getSession } = createCookieSessionStorage<SessionData>();
   const session = getSession({ cookies: mockAstroCookies });
 
   expect(session.has("keyForNumber")).toBe(false);
@@ -45,29 +45,11 @@ test("Session", () => {
   expect(session["keyForNumber"]).toBeUndefined();
 });
 
-test("Session with default", () => {
-  const { getSession } = createCookieSessionStorage<SessionData>({ keyForNumber: 0, keyForString: "default" });
-  const session = getSession({ cookies: mockAstroCookies });
-
-  session.keyForNumber = 1;
-  session.keyForString = "myValue";
-  expect(session.keyForNumber).toBe(1);
-  expect(session.keyForString).toBe("myValue");
-
-  session.reset("keyForNumber");
-  expect(session.keyForNumber).toBe(0);
-  expect(session.keyForString).toBe("myValue");
-
-  session.reset();
-  expect(session.keyForNumber).toBe(0);
-  expect(session.keyForString).toBe("default");
-});
-
 test("restore Session", () => {
   expect(data["astro.session"]).toBeUndefined();
 
 
-  const { getSession } = createCookieSessionStorage<SessionData>({});
+  const { getSession } = createCookieSessionStorage<SessionData>();
   const session1 = getSession({ cookies: mockAstroCookies });
   session1.set("keyForString", "myValue");
   session1["keyForNumber"] = 33;
@@ -84,7 +66,7 @@ const expectSessionChange = (fn: () => void) => {
 };
 
 test("secure", () => {
-  const { getSession } = createCookieSessionStorage<SessionData>({});
+  const { getSession } = createCookieSessionStorage<SessionData>();
   const session = getSession({ cookies: mockAstroCookies });
   session.set("keyForString", "myValue");
 
@@ -93,7 +75,7 @@ test("secure", () => {
 })
 
 test("cookieName option", () => {
-  const { getSession } = createCookieSessionStorage<SessionData>({}, { cookieName: "myCookieName" });
+  const { getSession } = createCookieSessionStorage<SessionData>({ cookieName: "myCookieName" });
   const session = getSession({ cookies: mockAstroCookies });
   session.set("keyForString", "myValue");
   expect(data["astro.session"]).toBeUndefined();
@@ -102,7 +84,7 @@ test("cookieName option", () => {
 });
 
 test("cookieSetOptions option", () => {
-  const { getSession } = createCookieSessionStorage<SessionData>({}, { cookieSetOptions: { secure: true } });
+  const { getSession } = createCookieSessionStorage<SessionData>({ cookieSetOptions: { secure: true } });
   const session = getSession({ cookies: mockAstroCookies });
   session.set("keyForString", "myValue");
   expect(setOptions).toEqual({ httpOnly: true, secure: true });

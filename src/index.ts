@@ -15,22 +15,19 @@ export type Options = {
 type Dict = { [key: string]: any };
 
 export function createCookieSessionStorage<T extends Dict>(
-  init: {},
   options?: Options
 ): {
   getSession: (context: Context) => Session<T> & T;
 };
 export function createCookieSessionStorage<T extends Record<string, any>>(
-  init: T,
   options?: Options
 ): {
   getSession: (context: Context) => Session<T> & T;
 };
 export function createCookieSessionStorage(
-  init: Record<string, any>,
   options?: Options
 ) {
   return {
-    getSession: (context: Context) => Session.from(context, init, options),
+    getSession: (context: Context) => Session.from(context, options),
   };
 }

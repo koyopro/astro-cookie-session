@@ -13,24 +13,23 @@ export class Session<T> {
     // @ts-ignore
     secure: import.meta.env.PROD,
   };
-  protected data: T;
+  protected data: Partial<T>;
   protected secret: string;
 
   constructor(
     private context: Context,
-    protected init: T,
     options: Options = {}
   ) {
     this.key = options.cookieName || this.key;
     Object.assign(this.setOptions, options.cookieSetOptions);
     this.secret = getSecret();
-    this.data = Object.assign({}, init);
+    this.data = {};
     const jwt = this.context.cookies.get(this.key)?.value;
     this.restore(jwt);
   }
 
-  static from<T>(context: Context, init: T, options: Options = {}) {
-    return new Proxy(new Session<T>(context, init, options), {
+  static from<T>(context: Context, options: Options = {}) {
+    return new Proxy(new Session<T>(context, options), {
       get(target, key, receiver) {
         if (["has", "get", "set", "reset"].includes(key as string)) {
           return Reflect.get(target, key, receiver).bind(target);
@@ -48,7 +47,7 @@ export class Session<T> {
     return this.get(key) != undefined;
   }
 
-  get<K extends keyof T>(key: K): T[K] {
+  get<K extends keyof T>(key: K): T[K] | undefined {
     return this.data[key];
   }
 
@@ -59,9 +58,9 @@ export class Session<T> {
 
   reset(key?: keyof T) {
     if (key) {
-      this.data[key] = this.init[key];
+      delete this.data[key];
     } else {
-      this.data = Object.assign({}, this.init);
+      this.data = {};
     }
     this.save();
   }
