@@ -12,7 +12,7 @@ Additionally, with TypeScript, you can utilize a type-safe session system.
 npm install astro-cookie-session
 ```
 
-## Getting Started
+## Configuration
 
 ### Setup Environment Variables
 
@@ -22,6 +22,19 @@ Prepare an encryption key and set it as the `SECRET_KEY_BASE` environment variab
 # .env
 SECRET_KEY_BASE=your_secret_key
 ```
+
+### Enable Server-side Rendering (SSR) in Astro's config
+
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+
+export default defineConfig({
+  'output': 'server',  // Enable SSR
+});
+```
+
+## Getting Started
 
 ### Settings up a session storage
 
@@ -38,6 +51,7 @@ export const { getSession } = createCookieSessionStorage<SessionData>();
 
 // If you want to set options for the cookie, you can do so as follows:
 // The following options are the default values.
+/*
 export const { getSession } = createCookieSessionStorage<SessionData>({
   cookieName: "astro.session",
   cookieSetOptions: {
@@ -48,6 +62,7 @@ export const { getSession } = createCookieSessionStorage<SessionData>({
     maxAge: undefined,
   }
 });
+*/
 ```
 
 ### Using the session in your Astro pages
@@ -62,8 +77,8 @@ import { getSession } from "../sessions";
 const session = getSession(Astro.cookies); // Prepare the session
 
 if (Astro.request.method === "POST") {
-  const form = await request.formData();
-  session.set('userId', form.get("id")); // Set the session data
+  const form = await Astro.request.formData();
+  session.set('userId', form.get("id") as string); // Set the session data
 }
 
 const userId = session.get("userId"); // Get the session data
@@ -73,7 +88,7 @@ const userId = session.get("userId"); // Get the session data
 ) : (
   <form method="post">
     <label>User ID: <input type="text" name="id" /></label>
-    <button type="submit">Log in</button>
+    <input type="submit" value="Log in" />
   </form>
 )}
 ```
@@ -82,13 +97,14 @@ const userId = session.get("userId"); // Get the session data
 
 ```typescript
 // src/pages/signin.ts
+import type { APIRoute } from "astro";
 import { getSession } from "../sessions";
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   const session = getSession(cookies); // Prepare the session
 
   const body = await request.json();
-  session.set(userId, body.id); // Set the session data
+  session.set('userId', body.id); // Set the session data
 
   const userId = session.get("userId"); // Get the session data
 
