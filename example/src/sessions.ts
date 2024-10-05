@@ -6,7 +6,11 @@ type SessionData = {
 };
 
 // Create a session storage
-export const { getSession } = createCookieSessionStorage<SessionData>();
+export const { getSession } = createCookieSessionStorage<SessionData>({
+  cookieSetOptions: {
+    path: "/",
+  }
+});
 
 // If you want to set options for the cookie, you can do so as follows:
 // The following options are the default values.
