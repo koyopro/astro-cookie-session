@@ -1,5 +1,5 @@
-import { APIContext } from "astro";
-import { createCookieSessionStorage, Nullable } from "../src";
+import { AstroCookies } from "astro";
+import { createCookieSessionStorage } from "../src";
 import { Session } from "../src/session";
 
 export type SessionData = {
@@ -9,7 +9,7 @@ export type SessionData = {
 
 test("createCookieSessionStorage", () => {
   const { getSession } = createCookieSessionStorage<SessionData>();
-  const session = getSession({} as APIContext);
+  const session = getSession({} as AstroCookies);
 
   expectTypeOf(session.count).toEqualTypeOf<number | undefined>();
   expectTypeOf(session.get("count")).toEqualTypeOf<number | undefined>();
@@ -44,7 +44,7 @@ test("createCookieSessionStorage", () => {
 
 test("any type", () => {
   const { getSession } = createCookieSessionStorage({});
-  const session = getSession({} as APIContext);
+  const session = getSession({} as AstroCookies);
 
   expectTypeOf(session).toEqualTypeOf<
     Session<{ [key: string]: any }> & { [key: string]: any }

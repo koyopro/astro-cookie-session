@@ -1,5 +1,5 @@
-import type { AstroCookieSetOptions } from "astro";
-import { Context, Options } from ".";
+import type { AstroCookies, AstroCookieSetOptions } from "astro";
+import { Options } from ".";
 // @ts-ignore
 import pkg from "jsonwebtoken";
 import { getSecret } from "./secret";
@@ -17,19 +17,19 @@ export class Session<T> {
   protected secret: string;
 
   constructor(
-    private context: Context,
+    private cookies: AstroCookies,
     options: Options = {}
   ) {
     this.key = options.cookieName || this.key;
     Object.assign(this.setOptions, options.cookieSetOptions);
     this.secret = getSecret();
     this.data = {};
-    const jwt = this.context.cookies.get(this.key)?.value;
+    const jwt = this.cookies.get(this.key)?.value;
     this.restore(jwt);
   }
 
-  static from<T>(context: Context, options: Options = {}) {
-    return new Proxy(new Session<T>(context, options), {
+  static from<T>(cookies: AstroCookies, options: Options = {}) {
+    return new Proxy(new Session<T>(cookies, options), {
       get(target, key, receiver) {
         if (["has", "get", "set", "reset"].includes(key as string)) {
           return Reflect.get(target, key, receiver).bind(target);
@@ -82,6 +82,6 @@ export class Session<T> {
 
   protected save() {
     const jwt = sign(this.data, this.secret, { algorithm: "HS256" });
-    this.context.cookies.set(this.key, jwt, this.setOptions);
+    this.cookies.set(this.key, jwt, this.setOptions);
   }
 }

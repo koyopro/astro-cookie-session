@@ -3,10 +3,6 @@ import { Session } from "./session";
 
 export { Session } from "./session";
 
-export type Context = {
-  cookies: AstroCookies;
-};
-
 export type Options = {
   cookieName?: string;
   cookieSetOptions?: AstroCookieSetOptions;
@@ -21,6 +17,6 @@ export function createCookieSessionStorage<T extends Record<string, any> = Dict>
   options?: Options
 ) {
   return {
-    getSession: (context: Context): Session<T> & Nullable<T> => Session.from(context, options) as any,
+    getSession: (cookies: AstroCookies): Session<T> & Nullable<T> => Session.from(cookies, options) as any,
   };
 }

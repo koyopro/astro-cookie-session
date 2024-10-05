@@ -22,7 +22,7 @@ test("Session", () => {
   expect(data["astro.session"]).toBeUndefined();
 
   const { getSession } = createCookieSessionStorage<SessionData>();
-  const session = getSession({ cookies: mockAstroCookies });
+  const session = getSession(mockAstroCookies);
 
   expect(session.has("keyForNumber")).toBe(false);
   expect(session.has("keyForString")).toBe(false);
@@ -50,11 +50,11 @@ test("restore Session", () => {
 
 
   const { getSession } = createCookieSessionStorage<SessionData>();
-  const session1 = getSession({ cookies: mockAstroCookies });
+  const session1 = getSession(mockAstroCookies);
   session1.set("keyForString", "myValue");
   session1["keyForNumber"] = 33;
 
-  const session2 = getSession({ cookies: mockAstroCookies });
+  const session2 = getSession(mockAstroCookies);
   expect(session2.get("keyForString")).toBe("myValue");
   expect(session2["keyForNumber"]).toBe(33);
 });
@@ -67,7 +67,7 @@ const expectSessionChange = (fn: () => void) => {
 
 test("secure", () => {
   const { getSession } = createCookieSessionStorage<SessionData>();
-  const session = getSession({ cookies: mockAstroCookies });
+  const session = getSession(mockAstroCookies);
   session.set("keyForString", "myValue");
 
   expect(data["astro.session"]).not.toContain("keyForString");
@@ -76,7 +76,7 @@ test("secure", () => {
 
 test("cookieName option", () => {
   const { getSession } = createCookieSessionStorage<SessionData>({ cookieName: "myCookieName" });
-  const session = getSession({ cookies: mockAstroCookies });
+  const session = getSession(mockAstroCookies);
   session.set("keyForString", "myValue");
   expect(data["astro.session"]).toBeUndefined();
   expect(data["myCookieName"]).not.toBeUndefined();
@@ -85,7 +85,7 @@ test("cookieName option", () => {
 
 test("cookieSetOptions option", () => {
   const { getSession } = createCookieSessionStorage<SessionData>({ cookieSetOptions: { secure: true } });
-  const session = getSession({ cookies: mockAstroCookies });
+  const session = getSession(mockAstroCookies);
   session.set("keyForString", "myValue");
   expect(setOptions).toEqual({ httpOnly: true, secure: true });
 })
