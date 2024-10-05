@@ -1,5 +1,6 @@
 export const getSecret = () => {
-  const secretKeyBase = process.env.SECRET_KEY_BASE;
+  // @ts-ignore
+  const secretKeyBase = import.meta.env.SECRET_KEY_BASE;
   if (secretKeyBase) {
     return secretKeyBase;
   }
