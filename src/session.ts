@@ -7,6 +7,11 @@ const { sign, verify, JsonWebTokenError } = pkg;
 
 export type Cookies = Omit<AstroCookies, 'merge'>;
 
+/**
+ * The `Session` class manages session data using cookies and JSON Web Tokens (JWT).
+ * It provides methods to get, set, and delete session data, as well as to restore
+ * and save the session state.
+ */
 export class Session<T> {
   key = "astro.session";
   setOptions: AstroCookieSetOptions = {
@@ -29,6 +34,9 @@ export class Session<T> {
     this.restore(jwt);
   }
 
+  /**
+   * Create a session object from AstroCookies.
+   */
   static from<T>(cookies: Cookies, options: Options = {}) {
     return new Proxy(new Session<T>(cookies, options), {
       get(target, key, receiver) {
@@ -44,19 +52,31 @@ export class Session<T> {
     });
   }
 
+  /**
+   * Check if a key exists in the session data.
+   */
   has<K extends keyof T>(key: K): boolean {
     return this.get(key) != undefined;
   }
 
+  /**
+   * Get a value from the session data.
+   */
   get<K extends keyof T>(key: K): T[K] | undefined {
     return this.data[key];
   }
 
+  /**
+   * Set a value in the session data.
+   */
   set<K extends keyof T>(key: K, value: T[K]) {
     this.data[key] = value;
     this.save();
   }
 
+  /**
+   * Delete a key from the session data. If no key is provided, all keys are deleted.
+   */
   delete(key?: keyof T) {
     if (key) {
       delete this.data[key];
