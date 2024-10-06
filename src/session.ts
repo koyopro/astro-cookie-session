@@ -1,9 +1,10 @@
-import type { AstroCookies, AstroCookieSetOptions } from "astro";
-import { Options } from ".";
 // @ts-ignore
 import pkg from "jsonwebtoken";
-import { getSecret } from "./secret";
 const { sign, verify, JsonWebTokenError } = pkg;
+
+import type { AstroCookies, AstroCookieSetOptions } from "astro";
+import type { Options } from "./index.js";
+import { getSecret } from "./secret.js";
 
 export type Cookies = Omit<AstroCookies, 'merge'>;
 

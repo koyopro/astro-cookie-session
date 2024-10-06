@@ -1,7 +1,7 @@
 import type { AstroCookieSetOptions } from "astro";
-import { Cookies, Session } from "./session";
+import { Cookies, Session } from "./session.js";
 
-export { Session } from "./session";
+export { Session } from "./session.js";
 
 export type Options = {
   /**
