@@ -23,7 +23,9 @@
     "session"
   ],
   "files": [
+    "LICENSE",
     "README.md",
+    "CHANGELOG.md",
     "dist"
   ],
   "author": "koyopro",
