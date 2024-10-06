@@ -8,6 +8,35 @@ import { getSecret } from "./secret.js";
 
 export type Cookies = Omit<AstroCookies, 'merge'>;
 
+export type DefaultFlash = {
+  success: string;
+  notice: string;
+  alert: string;
+  error: string;
+}
+
+export class Flash<T> {
+  constructor(private session: Session<any>) {}
+
+  set<K extends keyof T & string>(key: K, value: T[K]) {
+    this.session.set(this.keyFor(key), value);
+  }
+
+  get<K extends keyof T & string>(key: K): T[K] | undefined {
+    const value = this.session.get(this.keyFor(key));
+    this.session.delete(this.keyFor(key));
+    return value;
+  }
+
+  delete<K extends keyof T & string>(key: K) {
+    this.session.delete(this.keyFor(key));
+  }
+
+  protected keyFor(key: string) {
+    return `flash.${key}`;
+  }
+}
+
 /**
  * The `Session` class manages session data using cookies and JSON Web Tokens (JWT).
  * It provides methods to get, set, and delete session data, as well as to restore
@@ -22,6 +51,7 @@ export class Session<T> {
   };
   protected data: Partial<T>;
   protected secret: string;
+  flash = new Flash<DefaultFlash>(this);
 
   constructor(
     private cookies: Cookies,
@@ -41,6 +71,7 @@ export class Session<T> {
   static from<T>(cookies: Cookies, options: Options = {}) {
     return new Proxy(new Session<T>(cookies, options), {
       get(target, key, receiver) {
+        if (["flash"].includes(key as string)) return Reflect.get(target, key, receiver);
         if (["has", "get", "set", "delete"].includes(key as string)) {
           return Reflect.get(target, key, receiver).bind(target);
         }

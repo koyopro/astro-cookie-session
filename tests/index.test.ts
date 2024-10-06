@@ -89,3 +89,16 @@ test("cookieSetOptions option", () => {
   session.set("keyForString", "myValue");
   expect(setOptions).toEqual({ httpOnly: true, secure: true });
 })
+
+test("flash", () => {
+  const { getSession } = createCookieSessionStorage<SessionData>();
+  const session = getSession(mockAstroCookies);
+
+  session.flash.set("notice", "myValue");
+  expect(session.flash.get("notice")).toBe("myValue");
+  expect(session.flash.get("notice")).toBeUndefined();
+
+  session.flash.set("error", "myValue");
+  session.flash.delete("error");
+  expect(session.flash.get("error")).toBeUndefined();
+});
