@@ -16,9 +16,7 @@ export class Flash<T> {
     return new Proxy(new Flash<T>(storage), {
       get(target, key, receiver) {
         if (
-          ["cache", "storage", "keyFor", "set", "get", "delete"].includes(
-            key as string
-          )
+          ["cache", "storage", "set", "get", "delete"].includes(key as string)
         ) {
           return Reflect.get(target, key, receiver);
         }
@@ -33,22 +31,20 @@ export class Flash<T> {
 
   set<K extends keyof T & string>(key: K, value: T[K]) {
     delete this.cache[key];
-    this.storage.set(this.keyFor(key), value);
+    this.storage.set(keyFor(key), value);
   }
 
   get<K extends keyof T & string>(key: K): T[K] | undefined {
     if (key in this.cache) return this.cache[key];
-    this.cache[key] = this.storage.get(this.keyFor(key));
-    this.storage.delete(this.keyFor(key));
+    this.cache[key] = this.storage.get(keyFor(key));
+    this.storage.delete(keyFor(key));
     return this.cache[key];
   }
 
   delete<K extends keyof T & string>(key: K) {
     delete this.cache[key];
-    this.storage.delete(this.keyFor(key));
-  }
-
-  protected keyFor(key: string) {
-    return `flash.${key}`;
+    this.storage.delete(keyFor(key));
   }
 }
+
+const keyFor = (key: string) => `flash.${key}`;
