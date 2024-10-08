@@ -1,5 +1,6 @@
 import { Nullable } from "./session";
 import { CookieStorage } from "./storage";
+import { addDictInterface } from "./utils";
 
 export type DefaultFlash = {
   success: string;
@@ -14,20 +15,13 @@ export class Flash<T> {
   constructor(private storage: CookieStorage) {}
 
   static from<T>(storage: CookieStorage): Flash<T> & Nullable<T> {
-    return new Proxy(new Flash<T>(storage), {
-      get(target, key, receiver) {
-        if (
-          ["cache", "storage", "set", "get", "delete"].includes(key as string)
-        ) {
-          return Reflect.get(target, key, receiver);
-        }
-        return target.get(key as keyof T & string);
-      },
-      set(target, p, newValue, receiver) {
-        target.set(p as keyof T & string, newValue);
-        return true;
-      },
-    }) as any;
+    return addDictInterface(new this<T>(storage), [
+      "cache",
+      "storage",
+      "set",
+      "get",
+      "delete",
+    ]);
   }
 
   set<K extends keyof T & string>(key: K, value: T[K]) {

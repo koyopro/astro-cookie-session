@@ -1,6 +1,7 @@
 import { DefaultFlash, Flash } from "./flash.js";
 import type { Options } from "./index.js";
 import { Cookies, CookieStorage } from "./storage.js";
+import { addDictInterface } from "./utils.js";
 
 export type Nullable<T> = {
   [P in keyof T]: T[P] | undefined;
@@ -28,20 +29,11 @@ export class Session<T, F = DefaultFlash> {
     cookies: Cookies,
     options: Options = {}
   ): Session<T, F> & Nullable<T> {
-    return new Proxy(new Session<T, F>(cookies, options), {
-      get(target, key, receiver) {
-        if (["flash"].includes(key as string))
-          return Reflect.get(target, key, receiver);
-        if (["has", "get", "set", "delete"].includes(key as string)) {
-          return Reflect.get(target, key, receiver).bind(target);
-        }
-        return target.get(key as keyof T);
-      },
-      set(target, key, value) {
-        target.set(key as keyof T, value);
-        return true;
-      },
-    }) as any;
+    return addDictInterface(
+      new this<T, F>(cookies, options),
+      ["flash"],
+      ["has", "get", "set", "delete"]
+    );
   }
 
   /**
