@@ -1,5 +1,5 @@
 import type { AstroCookieSetOptions } from "astro";
-import { Cookies, Session } from "./session.js";
+import { Cookies, DefaultFlash, Session } from "./session.js";
 
 export { Session } from "./session.js";
 
@@ -53,7 +53,7 @@ export type Nullable<T> = {
  * });
  * ```
  */
-export function createCookieSessionStorage<T extends Record<string, any> = Dict>(
+export function createCookieSessionStorage<T extends Record<string, any> = Dict, F extends Record<string, any> = DefaultFlash>(
   options?: Options
 ) {
   return {
@@ -73,6 +73,6 @@ export function createCookieSessionStorage<T extends Record<string, any> = Dict>
      * };
      * ```
      */
-    getSession: (cookies: Cookies): Session<T> & Nullable<T> => Session.from(cookies, options) as any,
+    getSession: (cookies: Cookies): Session<T, F> & Nullable<T> => Session.from(cookies, options) as any,
   };
 }

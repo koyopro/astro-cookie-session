@@ -68,3 +68,16 @@ test("flash", () => {
   // @ts-expect-error
   session.flash.get("foo")
 });
+
+test("flash with type", () => {
+  type FlashData = {
+    stringKey: string;
+  };
+  const { getSession } = createCookieSessionStorage<{}, FlashData>();
+  const session = getSession({} as AstroCookies);
+  expectTypeOf(session.flash.get("stringKey")).toEqualTypeOf<string | undefined>();
+  // @ts-expect-error
+  session.flash.set("stringKey", 1);
+  // @ts-expect-error
+  session.flash.get("foo")
+})

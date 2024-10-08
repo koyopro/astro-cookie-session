@@ -18,7 +18,7 @@ export type DefaultFlash = {
 export class Flash<T> {
   protected cache: Partial<T> = {};
 
-  constructor(private session: Session<any>) {}
+  constructor(private session: Session<any, any>) {}
 
   set<K extends keyof T & string>(key: K, value: T[K]) {
     delete this.cache[key];
@@ -47,7 +47,7 @@ export class Flash<T> {
  * It provides methods to get, set, and delete session data, as well as to restore
  * and save the session state.
  */
-export class Session<T> {
+export class Session<T, F = DefaultFlash> {
   key = "astro.session";
   setOptions: AstroCookieSetOptions = {
     httpOnly: true,
@@ -56,7 +56,7 @@ export class Session<T> {
   };
   protected data: Partial<T>;
   protected secret: string;
-  flash = new Flash<DefaultFlash>(this);
+  flash = new Flash<F>(this);
 
   constructor(
     private cookies: Cookies,
@@ -73,8 +73,8 @@ export class Session<T> {
   /**
    * Create a session object from AstroCookies.
    */
-  static from<T>(cookies: Cookies, options: Options = {}) {
-    return new Proxy(new Session<T>(cookies, options), {
+  static from<T, F>(cookies: Cookies, options: Options = {}) {
+    return new Proxy(new Session<T, F>(cookies, options), {
       get(target, key, receiver) {
         if (["flash"].includes(key as string)) return Reflect.get(target, key, receiver);
         if (["has", "get", "set", "delete"].includes(key as string)) {
