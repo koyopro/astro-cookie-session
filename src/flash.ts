@@ -1,4 +1,4 @@
-import { Session } from "./session";
+import { CookieStorage } from "./storage";
 
 export type DefaultFlash = {
   success: string;
@@ -10,13 +10,13 @@ export type DefaultFlash = {
 export class Flash<T> {
   protected cache: Partial<T> = {};
 
-  constructor(private session: Session<any, any>) {}
+  constructor(private storage: CookieStorage) {}
 
-  static from<T>(session: Session<any, any>) {
-    return new Proxy(new Flash<T>(session), {
+  static from<T>(storage: CookieStorage) {
+    return new Proxy(new Flash<T>(storage), {
       get(target, key, receiver) {
         if (
-          ["cache", "session", "keyFor", "set", "get", "delete"].includes(
+          ["cache", "storage", "keyFor", "set", "get", "delete"].includes(
             key as string
           )
         ) {
@@ -33,19 +33,19 @@ export class Flash<T> {
 
   set<K extends keyof T & string>(key: K, value: T[K]) {
     delete this.cache[key];
-    this.session.set(this.keyFor(key), value);
+    this.storage.set(this.keyFor(key), value);
   }
 
   get<K extends keyof T & string>(key: K): T[K] | undefined {
     if (key in this.cache) return this.cache[key];
-    this.cache[key] = this.session.get(this.keyFor(key));
-    this.session.delete(this.keyFor(key));
+    this.cache[key] = this.storage.get(this.keyFor(key));
+    this.storage.delete(this.keyFor(key));
     return this.cache[key];
   }
 
   delete<K extends keyof T & string>(key: K) {
     delete this.cache[key];
-    this.session.delete(this.keyFor(key));
+    this.storage.delete(this.keyFor(key));
   }
 
   protected keyFor(key: string) {

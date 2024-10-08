@@ -1,8 +1,9 @@
 import type { AstroCookieSetOptions } from "astro";
 import { DefaultFlash, Flash } from "./flash.js";
-import { Cookies, Nullable, Session } from "./session.js";
+import { Nullable, Session } from "./session.js";
+import { Cookies, CookieStorage } from "./storage.js";
 
-export { Flash, Session };
+export { CookieStorage, Flash, Session };
 
 export type Options = {
   /**

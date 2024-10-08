@@ -1,13 +1,6 @@
-// @ts-ignore
-import pkg from "jsonwebtoken";
-const { sign, verify, JsonWebTokenError } = pkg;
-
-import type { AstroCookies, AstroCookieSetOptions } from "astro";
 import { DefaultFlash, Flash } from "./flash.js";
 import type { Options } from "./index.js";
-import { getSecret } from "./secret.js";
-
-export type Cookies = Omit<AstroCookies, "merge">;
+import { Cookies, CookieStorage } from "./storage.js";
 
 export type Nullable<T> = {
   [P in keyof T]: T[P] | undefined;
@@ -19,23 +12,13 @@ export type Nullable<T> = {
  * and save the session state.
  */
 export class Session<T, F = DefaultFlash> {
-  key = "astro.session";
-  setOptions: AstroCookieSetOptions = {
-    httpOnly: true,
-    // @ts-ignore
-    secure: import.meta.env.PROD,
-  };
-  protected data: Partial<T>;
-  protected secret: string;
-  flash = Flash.from<F>(this) as Flash<F> & Nullable<F>;
+  flash: Flash<F> & Nullable<F>;
 
-  constructor(private cookies: Cookies, options: Options = {}) {
-    this.key = options.cookieName || this.key;
-    Object.assign(this.setOptions, options.cookieSetOptions);
-    this.secret = getSecret();
-    this.data = {};
-    const jwt = this.cookies.get(this.key)?.value;
-    this.restore(jwt);
+  protected storage: CookieStorage;
+
+  constructor(cookies: Cookies, options: Options = {}) {
+    this.storage = new CookieStorage(cookies, options);
+    this.flash = Flash.from<F>(this.storage) as any;
   }
 
   /**
@@ -62,53 +45,27 @@ export class Session<T, F = DefaultFlash> {
    * Check if a key exists in the session data.
    */
   has<K extends keyof T>(key: K): boolean {
-    return this.get(key) != undefined;
+    return this.storage.has(key);
   }
 
   /**
    * Get a value from the session data.
    */
   get<K extends keyof T>(key: K): T[K] | undefined {
-    return this.data[key];
+    return this.storage.get(key);
   }
 
   /**
    * Set a value in the session data.
    */
   set<K extends keyof T>(key: K, value: T[K]) {
-    this.data[key] = value;
-    this.save();
+    this.storage.set(key, value);
   }
 
   /**
    * Delete a key from the session data. If no key is provided, all keys are deleted.
    */
   delete(key?: keyof T) {
-    if (key) {
-      delete this.data[key];
-    } else {
-      this.data = {};
-    }
-    this.save();
-  }
-
-  protected restore(jwt: string | undefined) {
-    if (!jwt) return;
-    try {
-      const v = verify(jwt, this.secret, { algorithms: ["HS256"] });
-      if (!v || typeof v !== "object") return;
-      Object.assign(this.data as any, v);
-    } catch (e: unknown) {
-      if (e instanceof JsonWebTokenError) {
-        // ignore
-      } else {
-        throw e;
-      }
-    }
-  }
-
-  protected save() {
-    const jwt = sign(this.data, this.secret, { algorithm: "HS256" });
-    this.cookies.set(this.key, jwt, this.setOptions);
+    this.storage.delete(key);
   }
 }
