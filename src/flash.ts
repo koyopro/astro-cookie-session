@@ -1,4 +1,4 @@
-import { CookieStorage } from "./storage";
+import { CookieStorage } from "./storage.js";
 import { addDictInterface, Nullable } from "./utils.js";
 
 export type DefaultFlash = {
