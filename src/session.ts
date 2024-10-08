@@ -1,6 +1,5 @@
 import { DefaultFlash, Flash } from "./flash.js";
-import type { Options } from "./index.js";
-import { Cookies, CookieStorage } from "./storage.js";
+import { CookieStorage } from "./storage.js";
 import { addDictInterface } from "./utils.js";
 
 export type Nullable<T> = {
@@ -13,24 +12,16 @@ export type Nullable<T> = {
  * and save the session state.
  */
 export class Session<T, F = DefaultFlash> {
-  flash: ReturnType<typeof Flash.from<F>>;
+  public flash = Flash.from<F>(this.storage);
 
-  protected storage: CookieStorage;
-
-  constructor(cookies: Cookies, options: Options = {}) {
-    this.storage = new CookieStorage(cookies, options);
-    this.flash = Flash.from<F>(this.storage);
-  }
+  constructor(protected storage: CookieStorage) {}
 
   /**
    * Create a session object from AstroCookies.
    */
-  static from<T, F>(
-    cookies: Cookies,
-    options: Options = {}
-  ): Session<T, F> & Nullable<T> {
+  static from<T, F>(storage: CookieStorage): Session<T, F> & Nullable<T> {
     return addDictInterface(
-      new this<T, F>(cookies, options),
+      new this<T, F>(storage),
       ["flash"],
       ["has", "get", "set", "delete"]
     );

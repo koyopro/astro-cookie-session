@@ -72,6 +72,7 @@ export function createCookieSessionStorage<
      * };
      * ```
      */
-    getSession: (cookies: Cookies) => Session.from<T, F>(cookies, options),
+    getSession: (cookies: Cookies) =>
+      Session.from<T, F>(new CookieStorage(cookies, options)),
   };
 }
