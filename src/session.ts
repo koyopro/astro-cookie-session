@@ -1,10 +1,6 @@
 import { DefaultFlash, Flash } from "./flash.js";
 import { CookieStorage } from "./storage.js";
-import { addDictInterface } from "./utils.js";
-
-export type Nullable<T> = {
-  [P in keyof T]: T[P] | undefined;
-};
+import { addDictInterface, Nullable } from "./utils.js";
 
 /**
  * The `Session` class manages session data using cookies and JSON Web Tokens (JWT).

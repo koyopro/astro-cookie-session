@@ -1,3 +1,7 @@
+export type Nullable<T> = {
+  [P in keyof T]: T[P] | undefined;
+};
+
 export const addDictInterface = (obj: any, props: string[], methods: string[] = []) => {
   return new Proxy(obj, {
     get(target, key, receiver) {

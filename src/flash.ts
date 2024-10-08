@@ -1,6 +1,5 @@
-import { Nullable } from "./session";
 import { CookieStorage } from "./storage";
-import { addDictInterface } from "./utils";
+import { addDictInterface, Nullable } from "./utils.js";
 
 export type DefaultFlash = {
   success: string;
