@@ -50,6 +50,22 @@ type Dict = { [key: string]: any };
  *   }
  * });
  * ```
+ * 
+ * @example Specify type for flash messages.
+ * ```ts
+ * type FlashData = {
+ *   success: string;
+ *   notice: string;
+ *   alert: string;
+ *   error: string;
+ * };
+ * 
+ * type SessionData = {
+ *   userId: string;
+ * };
+ * 
+ * export const { getSession } = createCookieSessionStorage<SessionData, FlashData>();
+ * ```
  */
 export function createCookieSessionStorage<
   T extends Record<string, any> = Dict,

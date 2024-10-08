@@ -8,12 +8,15 @@ import { addDictInterface, Nullable } from "./utils.js";
  * and save the session state.
  */
 export class Session<T, F = DefaultFlash> {
+  /**
+   * The `Flash` object for managing flash messages.
+   */
   public flash = Flash.from<F>(this.storage);
 
   constructor(protected storage: CookieStorage) {}
 
   /**
-   * Create a session object from AstroCookies.
+   * Create a `Session` object from a `CookieStorage` object.
    */
   static from<T, F>(storage: CookieStorage): Session<T, F> & Nullable<T> {
     return addDictInterface(
