@@ -3,63 +3,15 @@ import pkg from "jsonwebtoken";
 const { sign, verify, JsonWebTokenError } = pkg;
 
 import type { AstroCookies, AstroCookieSetOptions } from "astro";
+import { DefaultFlash, Flash } from "./flash.js";
 import type { Options } from "./index.js";
 import { getSecret } from "./secret.js";
 
-export type Cookies = Omit<AstroCookies, 'merge'>;
+export type Cookies = Omit<AstroCookies, "merge">;
 
 export type Nullable<T> = {
   [P in keyof T]: T[P] | undefined;
 };
-
-export type DefaultFlash = {
-  success: string;
-  notice: string;
-  alert: string;
-  error: string;
-}
-
-export class Flash<T> {
-  protected cache: Partial<T> = {};
-
-  constructor(private session: Session<any, any>) {}
-
-  static from<T>(session: Session<any, any>) {
-    return new Proxy(new Flash<T>(session), {
-      get(target, key, receiver) {
-        if (["cache", "session", "keyFor", "set", "get", "delete"].includes(key as string)) {
-          return Reflect.get(target, key, receiver);
-        }
-        return target.get(key as keyof T & string);
-      },
-      set(target, p, newValue, receiver) {
-        target.set(p as keyof T & string, newValue);
-        return true;
-      },
-    });
-  }
-
-  set<K extends keyof T & string>(key: K, value: T[K]) {
-    delete this.cache[key];
-    this.session.set(this.keyFor(key), value);
-  }
-
-  get<K extends keyof T & string>(key: K): T[K] | undefined {
-    if (key in this.cache) return this.cache[key];
-    this.cache[key] = this.session.get(this.keyFor(key));
-    this.session.delete(this.keyFor(key));
-    return this.cache[key];
-  }
-
-  delete<K extends keyof T & string>(key: K) {
-    delete this.cache[key];
-    this.session.delete(this.keyFor(key));
-  }
-
-  protected keyFor(key: string) {
-    return `flash.${key}`;
-  }
-}
 
 /**
  * The `Session` class manages session data using cookies and JSON Web Tokens (JWT).
@@ -77,10 +29,7 @@ export class Session<T, F = DefaultFlash> {
   protected secret: string;
   flash = Flash.from<F>(this) as Flash<F> & Nullable<F>;
 
-  constructor(
-    private cookies: Cookies,
-    options: Options = {}
-  ) {
+  constructor(private cookies: Cookies, options: Options = {}) {
     this.key = options.cookieName || this.key;
     Object.assign(this.setOptions, options.cookieSetOptions);
     this.secret = getSecret();
@@ -95,7 +44,8 @@ export class Session<T, F = DefaultFlash> {
   static from<T, F>(cookies: Cookies, options: Options = {}) {
     return new Proxy(new Session<T, F>(cookies, options), {
       get(target, key, receiver) {
-        if (["flash"].includes(key as string)) return Reflect.get(target, key, receiver);
+        if (["flash"].includes(key as string))
+          return Reflect.get(target, key, receiver);
         if (["has", "get", "set", "delete"].includes(key as string)) {
           return Reflect.get(target, key, receiver).bind(target);
         }

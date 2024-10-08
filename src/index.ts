@@ -1,7 +1,8 @@
 import type { AstroCookieSetOptions } from "astro";
-import { Cookies, DefaultFlash, Nullable, Session } from "./session.js";
+import { DefaultFlash, Flash } from "./flash.js";
+import { Cookies, Nullable, Session } from "./session.js";
 
-export { Session } from "./session.js";
+export { Flash, Session };
 
 export type Options = {
   /**
@@ -24,17 +25,17 @@ type Dict = { [key: string]: any };
  * type SessionData = {
  *   userId: string;
  * };
- * 
+ *
  * export const { getSession } = createCookieSessionStorage<SessionData>();
- * 
+ *
  * const session = getSession(astroCookies);
  * ```
- * 
+ *
  * @example If no type is specified, any key can be handled with values of any type.
  * ```ts
  * export const { getSession } = createCookieSessionStorage();
  * ```
- * 
+ *
  * @example Specifying options. The following options are the default values.
  * ```ts
  * export const { getSession } = createCookieSessionStorage({
@@ -49,18 +50,19 @@ type Dict = { [key: string]: any };
  * });
  * ```
  */
-export function createCookieSessionStorage<T extends Record<string, any> = Dict, F extends Record<string, any> = DefaultFlash>(
-  options?: Options
-) {
+export function createCookieSessionStorage<
+  T extends Record<string, any> = Dict,
+  F extends Record<string, any> = DefaultFlash
+>(options?: Options) {
   return {
     /**
      * Prepare a session object from AstroCookies.
-     * 
+     *
      * @example Using in Astro pages.
      * ```ts
      * const session = getSession(Astro.cookies);
      * ```
-     * 
+     *
      * @example Using in Astro API routes.
      * ```ts
      * export const POST: APIRoute = async ({ cookies }) => {
@@ -69,6 +71,7 @@ export function createCookieSessionStorage<T extends Record<string, any> = Dict,
      * };
      * ```
      */
-    getSession: (cookies: Cookies): Session<T, F> & Nullable<T> => Session.from(cookies, options) as any,
+    getSession: (cookies: Cookies): Session<T, F> & Nullable<T> =>
+      Session.from(cookies, options) as any,
   };
 }
