@@ -18,10 +18,15 @@ export class Flash<T> {
     return addDictInterface(new this<T>(storage), [
       "cache",
       "storage",
+      "has",
       "set",
       "get",
       "delete",
     ]);
+  }
+
+  has<K extends keyof T & string>(key: K): boolean {
+    return key in this.cache || this.storage.has(keyFor(key));
   }
 
   set<K extends keyof T & string>(key: K, value: T[K]) {

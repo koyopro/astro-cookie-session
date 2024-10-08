@@ -101,9 +101,12 @@ test("flash", () => {
   const { getSession } = createCookieSessionStorage<SessionData>();
   const session = getSession(mockAstroCookies);
 
+  expect(session.flash.has("notice")).toBe(false);
   session.flash.set("notice", "myValue");
+  expect(session.flash.has("notice")).toBe(true);
   expect(session.flash.get("notice")).toBe("myValue");
   expect(session.flash.get("notice")).toBe("myValue"); // cached value
+  expect(session.flash.has("notice")).toBe(true);
 
   session.flash.set("error", "myValue");
   session.flash.delete("error");
