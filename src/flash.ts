@@ -1,3 +1,4 @@
+import { Nullable } from "./session";
 import { CookieStorage } from "./storage";
 
 export type DefaultFlash = {
@@ -12,7 +13,7 @@ export class Flash<T> {
 
   constructor(private storage: CookieStorage) {}
 
-  static from<T>(storage: CookieStorage) {
+  static from<T>(storage: CookieStorage): Flash<T> & Nullable<T> {
     return new Proxy(new Flash<T>(storage), {
       get(target, key, receiver) {
         if (
@@ -26,7 +27,7 @@ export class Flash<T> {
         target.set(p as keyof T & string, newValue);
         return true;
       },
-    });
+    }) as any;
   }
 
   set<K extends keyof T & string>(key: K, value: T[K]) {

@@ -1,6 +1,6 @@
 import type { AstroCookieSetOptions } from "astro";
 import { DefaultFlash, Flash } from "./flash.js";
-import { Nullable, Session } from "./session.js";
+import { Session } from "./session.js";
 import { Cookies, CookieStorage } from "./storage.js";
 
 export { CookieStorage, Flash, Session };
@@ -72,7 +72,6 @@ export function createCookieSessionStorage<
      * };
      * ```
      */
-    getSession: (cookies: Cookies): Session<T, F> & Nullable<T> =>
-      Session.from(cookies, options) as any,
+    getSession: (cookies: Cookies) => Session.from<T, F>(cookies, options),
   };
 }

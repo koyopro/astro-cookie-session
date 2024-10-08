@@ -12,19 +12,22 @@ export type Nullable<T> = {
  * and save the session state.
  */
 export class Session<T, F = DefaultFlash> {
-  flash: Flash<F> & Nullable<F>;
+  flash: ReturnType<typeof Flash.from<F>>;
 
   protected storage: CookieStorage;
 
   constructor(cookies: Cookies, options: Options = {}) {
     this.storage = new CookieStorage(cookies, options);
-    this.flash = Flash.from<F>(this.storage) as any;
+    this.flash = Flash.from<F>(this.storage);
   }
 
   /**
    * Create a session object from AstroCookies.
    */
-  static from<T, F>(cookies: Cookies, options: Options = {}) {
+  static from<T, F>(
+    cookies: Cookies,
+    options: Options = {}
+  ): Session<T, F> & Nullable<T> {
     return new Proxy(new Session<T, F>(cookies, options), {
       get(target, key, receiver) {
         if (["flash"].includes(key as string))
@@ -38,7 +41,7 @@ export class Session<T, F = DefaultFlash> {
         target.set(key as keyof T, value);
         return true;
       },
-    });
+    }) as any;
   }
 
   /**
