@@ -96,9 +96,16 @@ test("flash", () => {
 
   session.flash.set("notice", "myValue");
   expect(session.flash.get("notice")).toBe("myValue");
-  expect(session.flash.get("notice")).toBeUndefined();
+  expect(session.flash.get("notice")).toBe("myValue"); // cached value
 
   session.flash.set("error", "myValue");
   session.flash.delete("error");
   expect(session.flash.get("error")).toBeUndefined();
+
+  session.flash.set("alert", "myAlert");
+
+  const session2 = getSession(mockAstroCookies);
+  expect(session2.flash.get("notice")).toBeUndefined();
+  expect(session2.flash.get("error")).toBeUndefined();
+  expect(session2.flash.get("alert")).toEqual("myAlert");
 });

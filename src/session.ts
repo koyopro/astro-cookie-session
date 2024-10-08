@@ -16,19 +16,24 @@ export type DefaultFlash = {
 }
 
 export class Flash<T> {
+  protected cache: Partial<T> = {};
+
   constructor(private session: Session<any>) {}
 
   set<K extends keyof T & string>(key: K, value: T[K]) {
+    delete this.cache[key];
     this.session.set(this.keyFor(key), value);
   }
 
   get<K extends keyof T & string>(key: K): T[K] | undefined {
-    const value = this.session.get(this.keyFor(key));
+    if (key in this.cache) return this.cache[key];
+    this.cache[key] = this.session.get(this.keyFor(key));
     this.session.delete(this.keyFor(key));
-    return value;
+    return this.cache[key];
   }
 
   delete<K extends keyof T & string>(key: K) {
+    delete this.cache[key];
     this.session.delete(this.keyFor(key));
   }
 
