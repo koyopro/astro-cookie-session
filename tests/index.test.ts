@@ -104,8 +104,11 @@ test("flash", () => {
 
   session.flash.set("alert", "myAlert");
 
+  session.flash["success"] = "mySuccess";
+
   const session2 = getSession(mockAstroCookies);
   expect(session2.flash.get("notice")).toBeUndefined();
   expect(session2.flash.get("error")).toBeUndefined();
   expect(session2.flash.get("alert")).toEqual("myAlert");
+  expect(session2.flash["success"]).toBe("mySuccess");
 });

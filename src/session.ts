@@ -8,6 +8,10 @@ import { getSecret } from "./secret.js";
 
 export type Cookies = Omit<AstroCookies, 'merge'>;
 
+export type Nullable<T> = {
+  [P in keyof T]: T[P] | undefined;
+};
+
 export type DefaultFlash = {
   success: string;
   notice: string;
@@ -19,6 +23,21 @@ export class Flash<T> {
   protected cache: Partial<T> = {};
 
   constructor(private session: Session<any, any>) {}
+
+  static from<T>(session: Session<any, any>) {
+    return new Proxy(new Flash<T>(session), {
+      get(target, key, receiver) {
+        if (["cache", "session", "keyFor", "set", "get", "delete"].includes(key as string)) {
+          return Reflect.get(target, key, receiver);
+        }
+        return target.get(key as keyof T & string);
+      },
+      set(target, p, newValue, receiver) {
+        target.set(p as keyof T & string, newValue);
+        return true;
+      },
+    });
+  }
 
   set<K extends keyof T & string>(key: K, value: T[K]) {
     delete this.cache[key];
@@ -56,7 +75,7 @@ export class Session<T, F = DefaultFlash> {
   };
   protected data: Partial<T>;
   protected secret: string;
-  flash = new Flash<F>(this);
+  flash = Flash.from<F>(this) as Flash<F> & Nullable<F>;
 
   constructor(
     private cookies: Cookies,

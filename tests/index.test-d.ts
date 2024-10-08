@@ -67,6 +67,12 @@ test("flash", () => {
   session.flash.set("notice", 1);
   // @ts-expect-error
   session.flash.get("foo")
+
+  expectTypeOf(session.flash["success"]).toEqualTypeOf<string | undefined>();
+  // @ts-expect-error
+  session.flash["notice"] = 1;
+  // @ts-expect-error
+  session.flash["foo"]
 });
 
 test("flash with type", () => {

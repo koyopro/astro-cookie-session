@@ -1,5 +1,5 @@
 import type { AstroCookieSetOptions } from "astro";
-import { Cookies, DefaultFlash, Session } from "./session.js";
+import { Cookies, DefaultFlash, Nullable, Session } from "./session.js";
 
 export { Session } from "./session.js";
 
@@ -15,10 +15,6 @@ export type Options = {
 };
 
 type Dict = { [key: string]: any };
-
-export type Nullable<T> = {
-  [P in keyof T]: T[P] | undefined;
-};
 
 /**
  * Creates a cookie session storage.
