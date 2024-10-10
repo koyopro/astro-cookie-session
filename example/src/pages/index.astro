@@ -6,22 +6,33 @@ const session = getSession(Astro.cookies); // Prepare the session
 
 if (Astro.request.method === "POST") {
   const form = await Astro.request.formData();
-  session.set('userId', form.get("id") as string); // Set the session data
+  session.set("userId", form.get("id") as string); // Set the session data
   // session.userId = form.get("id") as string; // You can also use this code
+
+  session.flash.set("notice", "You have successfully logged in."); // Set the flash message
+  // session.flash["notice"] = "You have successfully logged in."; // You can also use this code
 }
 
 const userId = session.get("userId"); // Get the session data
 // const userId = session.userId; // You can also use this code
+const flash = session.flash.get("notice"); // Get the flash message. The message will be deleted after getting it.
+// const flash = session.flash["notice"]; // You can also use this code
 ---
-{userId ? (
-  <p>Hello, {userId}!</p>
 
-  <form method="post" action="/signout">
-    <input type="submit" value="Log out" />
-  </form>
-) : (
-  <form method="post">
-    <input type="text" name="id" placeholder="UserId" />
-    <input type="submit" value="Log in" />
-  </form>
-)}
+{flash && <p>{flash}</p>}
+
+{
+  userId ? (
+    <>
+      <p>Hello, {userId}!</p>
+      <form method="post" action="/signout">
+        <input type="submit" value="Log out" />
+      </form>
+    </>
+  ) : (
+    <form method="post">
+      <input type="text" name="id" placeholder="UserId" />
+      <input type="submit" value="Log in" />
+    </form>
+  )
+}

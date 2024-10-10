@@ -1,7 +1,9 @@
 import type { AstroCookieSetOptions } from "astro";
-import { Cookies, Session } from "./session.js";
+import { DefaultFlash, Flash } from "./flash.js";
+import { Session } from "./session.js";
+import { Cookies, CookieStorage } from "./storage.js";
 
-export { Session } from "./session.js";
+export { CookieStorage, Flash, Session };
 
 export type Options = {
   /**
@@ -16,10 +18,6 @@ export type Options = {
 
 type Dict = { [key: string]: any };
 
-export type Nullable<T> = {
-  [P in keyof T]: T[P] | undefined;
-};
-
 /**
  * Creates a cookie session storage.
  *
@@ -28,17 +26,17 @@ export type Nullable<T> = {
  * type SessionData = {
  *   userId: string;
  * };
- * 
+ *
  * export const { getSession } = createCookieSessionStorage<SessionData>();
- * 
+ *
  * const session = getSession(astroCookies);
  * ```
- * 
+ *
  * @example If no type is specified, any key can be handled with values of any type.
  * ```ts
  * export const { getSession } = createCookieSessionStorage();
  * ```
- * 
+ *
  * @example Specifying options. The following options are the default values.
  * ```ts
  * export const { getSession } = createCookieSessionStorage({
@@ -52,19 +50,36 @@ export type Nullable<T> = {
  *   }
  * });
  * ```
+ * 
+ * @example Specify type for flash messages.
+ * ```ts
+ * type FlashData = {
+ *   success: string;
+ *   notice: string;
+ *   alert: string;
+ *   error: string;
+ * };
+ * 
+ * type SessionData = {
+ *   userId: string;
+ * };
+ * 
+ * export const { getSession } = createCookieSessionStorage<SessionData, FlashData>();
+ * ```
  */
-export function createCookieSessionStorage<T extends Record<string, any> = Dict>(
-  options?: Options
-) {
+export function createCookieSessionStorage<
+  T extends Record<string, any> = Dict,
+  F extends Record<string, any> = DefaultFlash
+>(options?: Options) {
   return {
     /**
      * Prepare a session object from AstroCookies.
-     * 
+     *
      * @example Using in Astro pages.
      * ```ts
      * const session = getSession(Astro.cookies);
      * ```
-     * 
+     *
      * @example Using in Astro API routes.
      * ```ts
      * export const POST: APIRoute = async ({ cookies }) => {
@@ -73,6 +88,7 @@ export function createCookieSessionStorage<T extends Record<string, any> = Dict>
      * };
      * ```
      */
-    getSession: (cookies: Cookies): Session<T> & Nullable<T> => Session.from(cookies, options) as any,
+    getSession: (cookies: Cookies) =>
+      Session.from<T, F>(new CookieStorage(cookies, options)),
   };
 }

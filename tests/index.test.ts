@@ -5,7 +5,11 @@ let data: Record<string, any> = {};
 let setOptions: AstroCookieSetOptions | undefined;
 const mockAstroCookies = {
   get: (key: string) => ({ value: data[key] }),
-  set: (key: string, value: string | Record<string, any>, options?: AstroCookieSetOptions) => {
+  set: (
+    key: string,
+    value: string | Record<string, any>,
+    options?: AstroCookieSetOptions
+  ) => {
     data[key] = value;
     setOptions = options;
   },
@@ -16,7 +20,7 @@ type SessionData = {
   keyForNumber?: number;
 };
 
-beforeEach(() => (data = {}, setOptions = undefined));
+beforeEach(() => ((data = {}), (setOptions = undefined)));
 
 test("Session", () => {
   expect(data["astro.session"]).toBeUndefined();
@@ -48,7 +52,6 @@ test("Session", () => {
 test("restore Session", () => {
   expect(data["astro.session"]).toBeUndefined();
 
-
   const { getSession } = createCookieSessionStorage<SessionData>();
   const session1 = getSession(mockAstroCookies);
   session1.set("keyForString", "myValue");
@@ -72,10 +75,12 @@ test("secure", () => {
 
   expect(data["astro.session"]).not.toContain("keyForString");
   expect(data["astro.session"]).not.toContain("myValue");
-})
+});
 
 test("cookieName option", () => {
-  const { getSession } = createCookieSessionStorage<SessionData>({ cookieName: "myCookieName" });
+  const { getSession } = createCookieSessionStorage<SessionData>({
+    cookieName: "myCookieName",
+  });
   const session = getSession(mockAstroCookies);
   session.set("keyForString", "myValue");
   expect(data["astro.session"]).toBeUndefined();
@@ -84,8 +89,36 @@ test("cookieName option", () => {
 });
 
 test("cookieSetOptions option", () => {
-  const { getSession } = createCookieSessionStorage<SessionData>({ cookieSetOptions: { secure: true } });
+  const { getSession } = createCookieSessionStorage<SessionData>({
+    cookieSetOptions: { secure: true },
+  });
   const session = getSession(mockAstroCookies);
   session.set("keyForString", "myValue");
   expect(setOptions).toEqual({ httpOnly: true, secure: true });
-})
+});
+
+test("flash", () => {
+  const { getSession } = createCookieSessionStorage<SessionData>();
+  const session = getSession(mockAstroCookies);
+
+  expect(session.flash.has("notice")).toBe(false);
+  session.flash.set("notice", "myValue");
+  expect(session.flash.has("notice")).toBe(true);
+  expect(session.flash.get("notice")).toBe("myValue");
+  expect(session.flash.get("notice")).toBe("myValue"); // cached value
+  expect(session.flash.has("notice")).toBe(true);
+
+  session.flash.set("error", "myValue");
+  session.flash.delete("error");
+  expect(session.flash.get("error")).toBeUndefined();
+
+  session.flash.set("alert", "myAlert");
+
+  session.flash["success"] = "mySuccess";
+
+  const session2 = getSession(mockAstroCookies);
+  expect(session2.flash.get("notice")).toBeUndefined();
+  expect(session2.flash.get("error")).toBeUndefined();
+  expect(session2.flash.get("alert")).toEqual("myAlert");
+  expect(session2.flash["success"]).toBe("mySuccess");
+});

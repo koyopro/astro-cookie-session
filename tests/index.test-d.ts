@@ -55,3 +55,39 @@ test("any type", () => {
   session.set("foo", 2);
   expectTypeOf(session.get("foo")).toEqualTypeOf<any>();
 });
+
+test("flash", () => {
+  const { getSession } = createCookieSessionStorage();
+  const session = getSession({} as AstroCookies);
+  expectTypeOf(session.flash.get("success")).toEqualTypeOf<
+    string | undefined
+  >();
+  expectTypeOf(session.flash.get("notice")).toEqualTypeOf<string | undefined>();
+  expectTypeOf(session.flash.get("alert")).toEqualTypeOf<string | undefined>();
+  expectTypeOf(session.flash.get("error")).toEqualTypeOf<string | undefined>();
+  // @ts-expect-error
+  session.flash.set("notice", 1);
+  // @ts-expect-error
+  session.flash.get("foo");
+
+  expectTypeOf(session.flash["success"]).toEqualTypeOf<string | undefined>();
+  // @ts-expect-error
+  session.flash["notice"] = 1;
+  // @ts-expect-error
+  session.flash["foo"];
+});
+
+test("flash with type", () => {
+  type FlashData = {
+    stringKey: string;
+  };
+  const { getSession } = createCookieSessionStorage<{}, FlashData>();
+  const session = getSession({} as AstroCookies);
+  expectTypeOf(session.flash.get("stringKey")).toEqualTypeOf<
+    string | undefined
+  >();
+  // @ts-expect-error
+  session.flash.set("stringKey", 1);
+  // @ts-expect-error
+  session.flash.get("foo");
+});
