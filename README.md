@@ -133,14 +133,14 @@ if (Astro.request.method === "POST") {
   session.set("userId", form.get("id") as string); // Set the session data
   // session.userId = form.get("id") as string; // You can also use this code
 
-  session.flash.set("success", "You have successfully logged in."); // Set the flash message
-  // session.flash["success"] = "You have successfully logged in."; // You can also use this code
+  session.flash.set("notice", "You have successfully logged in."); // Set the flash message
+  // session.flash["notice"] = "You have successfully logged in."; // You can also use this code
 }
 
 const userId = session.get("userId"); // Get the session data
 // const userId = session.userId; // You can also use this code
-const flash = session.flash.get("success"); // Get the flash message. The message will be deleted after getting it.
-// const flash = session.flash["success"]; // You can also use this code
+const flash = session.flash.get("notice"); // Get the flash message. The message will be deleted after getting it.
+// const flash = session.flash["notice"]; // You can also use this code
 ---
 
 {flash && <p>{flash}</p>}
@@ -174,8 +174,8 @@ export const POST: APIRoute = async ({ cookies, redirect }) => {
 
   session.delete("userId"); // Remove the user ID from the session
 
-  session.flash.set("success", "You have successfully logged out."); // Set the flash message
-  // session.flash["success"] = "You have successfully logged out."; // You can also use this code
+  session.flash.set("notice", "You have successfully logged out."); // Set the flash message
+  // session.flash["notice"] = "You have successfully logged out."; // You can also use this code
 
   return redirect("/");
 };

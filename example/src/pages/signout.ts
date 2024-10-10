@@ -7,8 +7,8 @@ export const POST: APIRoute = async ({ cookies, redirect }) => {
 
   session.delete("userId"); // Remove the user ID from the session
 
-  session.flash.set("success", "You have successfully logged out."); // Set the flash message
-  // session.flash["success"] = "You have successfully logged out."; // You can also use this code
+  session.flash.set("notice", "You have successfully logged out."); // Set the flash message
+  // session.flash["notice"] = "You have successfully logged out."; // You can also use this code
 
   return redirect("/");
 };
