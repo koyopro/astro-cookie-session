@@ -75,6 +75,11 @@ test("secure", () => {
 
   expect(data["astro.session"]).not.toContain("keyForString");
   expect(data["astro.session"]).not.toContain("myValue");
+
+  // Verify that the value is encrypted
+  const encodedValue: string = data["astro.session"]?.split(".")[1] || "";
+  const value = Buffer.from(encodedValue, "base64").toString("utf-8");
+  expect(() => JSON.parse(value)).toThrow(SyntaxError);
 });
 
 test("JWT verification", () => {

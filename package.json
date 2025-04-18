@@ -31,7 +31,9 @@
   "author": "koyopro",
   "license": "MIT",
   "dependencies": {
+    "@types/crypto-js": "^4.2.2",
     "astro": ">=4.0.0",
+    "crypto-js": "^4.2.0",
     "jsonwebtoken": "^9.0.0"
   },
   "devDependencies": {
