@@ -77,6 +77,17 @@ test("secure", () => {
   expect(data["astro.session"]).not.toContain("myValue");
 });
 
+test("JWT verification", () => {
+  const jwt =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXlGb3JTdHJpbmciOiJteVZhbHVlIiwiaWF0IjoxNzQ0OTk5ODE5fQ.ZbBheRT6Z6JDuFM0qmwm25N_07i9ziqzWe6Bahwye8k";
+  data["astro.session"] = jwt;
+
+  const { getSession } = createCookieSessionStorage<SessionData>();
+  const session = getSession(mockAstroCookies);
+
+  expect(session.get("keyForString")).toBe("myValue");
+});
+
 test("cookieName option", () => {
   const { getSession } = createCookieSessionStorage<SessionData>({
     cookieName: "myCookieName",
