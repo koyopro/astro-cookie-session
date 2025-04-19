@@ -75,6 +75,22 @@ test("secure", () => {
 
   expect(data["astro.session"]).not.toContain("keyForString");
   expect(data["astro.session"]).not.toContain("myValue");
+
+  // Verify that the value is encrypted
+  const encodedValue: string = data["astro.session"]?.split(".")[1] || "";
+  const value = Buffer.from(encodedValue, "base64").toString("utf-8");
+  expect(() => JSON.parse(value)).toThrow(SyntaxError);
+});
+
+test("JWT verification", () => {
+  const jwt =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXlGb3JTdHJpbmciOiJteVZhbHVlIiwiaWF0IjoxNzQ0OTk5ODE5fQ.ZbBheRT6Z6JDuFM0qmwm25N_07i9ziqzWe6Bahwye8k";
+  data["astro.session"] = jwt;
+
+  const { getSession } = createCookieSessionStorage<SessionData>();
+  const session = getSession(mockAstroCookies);
+
+  expect(session.get("keyForString")).toBe("myValue");
 });
 
 test("cookieName option", () => {
