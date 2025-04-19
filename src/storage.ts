@@ -71,6 +71,9 @@ export class CookieStorage {
   }
 
   save() {
+    // Create a JWT with a payload encrypted using AES-CBC
+    // - PASETO or JWE (AES-GCM) libraries with synchronous APIs were not found
+    // - AES-CBC alone does not provide tamper resistance, but it is protected by the JWT signature
     const encryptedData = CryptoJS.AES.encrypt(
       JSON.stringify(this.data),
       this.secret
